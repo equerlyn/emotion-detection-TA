@@ -1,0 +1,50 @@
+[
+  {
+      "label": "HVAHD",
+      "name": "Happy",
+      "emoji": "😀",
+      "description": "High valence, high arousal, high dominance. Feeling happy, excited, and in control."
+  },
+  {
+      "label": "HVALD",
+      "name": "Confident",
+      "emoji": "😎",
+      "description": "High valence, high arousal, low dominance. Feeling positive and excited but not necessarily in control."
+  },
+  {
+      "label": "HVLAHD",
+      "name": "Curious",
+      "emoji": "🧐",
+      "description": "High valence, low arousal, high dominance. Feeling positive, calm, and in control."
+  },
+  {
+      "label": "HVLALD",
+      "name": "Peaceful",
+      "emoji": "😌",
+      "description": "High valence, low arousal, low dominance. Feeling positive and calm but not in control."
+  },
+  {
+      "label": "LVAHD",
+      "name": "Angry",
+      "emoji": "😡",
+      "description": "Low valence, high arousal, high dominance. Feeling negative, aroused, and in control."
+  },
+  {
+      "label": "LVALD",
+      "name": "Anxious",
+      "emoji": "😰",
+      "description": "Low valence, high arousal, low dominance. Feeling negative, aroused, and not in control."
+  },
+  {
+      "label": "LVLAHD",
+      "name": "Sad",
+      "emoji": "😔",
+      "description": "Low valence, low arousal, high dominance. Feeling negative, calm, and in control."
+  },
+  {
+      "label": "LVLALD",
+      "name": "Tired",
+      "emoji": "😪",
+      "description": "Low valence, low arousal, low dominance. Feeling negative, calm, and not in control."
+  }
+]

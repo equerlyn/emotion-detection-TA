@@ -1,22 +1,23 @@
 import React from "react";
 
-const EmoCard = () => {
+const EmoCard = ({ label, name, emoji, description }) => {
   return (
     <div className="max-w-2xl bg-white rounded-lg border border-3 shadow-lg p-6 flex items-start gap-4">
       <div className="text-4xl">
-        <span role="img" aria-label="emoji">
-          😀
+        <span role="img" aria-label={name}>
+          {emoji}
         </span>
       </div>
 
-      {/* Konten Card */}
+      {/* Card Content */}
       <div className="flex flex-col justify-start">
-        {/* Judul */}
-        <h2 className="text-2xl font-semibold text-gray-800">HAHVL</h2>
+        {/* Title */}
+        <h2 className="text-2xl font-semibold text-gray-800">{label}</h2>
+        <h3 className="text-xl text-gray-700">{name}</h3>
 
-        {/* Deskripsi */}
+        {/* Description */}
         <p className="text-gray-600 mt-2">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus repellat officiis adipisci voluptates maiores voluptatem quia autem perferendis modi eveniet illum ab fugit, dolorum est. Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quod ea ipsa nemo aliquid quam, optio aut iusto, nulla possimus quaerat quibusdam dignissimos voluptates, ipsam minus.
+          {description}
         </p>
       </div>
     </div>

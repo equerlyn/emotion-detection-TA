@@ -1,23 +1,29 @@
-import { useState } from 'react'
-import './styles/index.css'
-import Navbar from './components/Navbar'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import MainPage from './pages/MainPage';
+import ResultPage from './pages/ResultPage';
+import EmoPage from './pages/EmoPage';
+import ErrorPage from './pages/ErrorPage';
+import { Provider } from 'react-redux';
+import { store } from './redux/store';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './styles/index.css';
 
 function App() {
   return (
-    <div className="app-container">
-      {/* <Navbar/> */}
-      ErrorPage
-      {/* <main>
+    <Provider store={store}>
+      <Router>
+        <ToastContainer position="top-right" autoClose={5000} />
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/archives" element={<ArchivePage />} />
-          <Route path="/notes/new" element={<AddPage />} />
-          <Route path="/notes/:id" element={<DetailPage />} />
-          <Route path="/*" element={<ErrorPage />} />
+          <Route path="/" element={<MainPage />} />
+          <Route path="/result" element={<ResultPage />} />
+          <Route path="/emotions" element={<EmoPage />} />
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
-      </main> */}
-    </div>
-  )
+      </Router>
+    </Provider>
+  );
 }
 
-export default App
+export default App;

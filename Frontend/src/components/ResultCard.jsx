@@ -15,25 +15,19 @@ const ResultCard = ({ valence, arousal, dominance, label, type }) => {
       </h2>
       <div className="flex justify-between my-4 text-xl">
         <span>Valence</span>
-        <span>
-          {valence} ({getLevel(valence)})
-        </span>
+        <span>{valence !== undefined ? valence.toFixed(1) : "N/A"} ({valence >= 5 ? "High" : "Low"})</span>
       </div>
       <hr className={`${type === "actual" ? "columbia-blue" : "french-blue"}`} />
       <div className="flex justify-between my-4 text-xl">
         <span>Arousal</span>
-        <span>
-          {arousal} ({getLevel(arousal)})
-        </span>
+        <span>{arousal !== undefined ? arousal.toFixed(1) : "N/A"} ({arousal >= 5 ? "High" : "Low"})</span>
       </div>
       <hr className={`${type === "actual" ? "columbia-blue" : "french-blue"}`} />
       <div className="flex justify-between my-4 text-xl">
         <span>Dominance</span>
-        <span>
-          {dominance} ({getLevel(dominance)})
-        </span>
+        <span>{dominance !== undefined ? dominance.toFixed(1) : "N/A"} ({dominance >= 5 ? "High" : "Low"})</span>
       </div>
-      {/* <h3 className="my-8 text-2xl font-bold sunglow">{label}</h3> */}
+      {label && <h3 className="my-8 text-2xl font-bold sunglow">{label}</h3>}
     </div>
   );
 };
