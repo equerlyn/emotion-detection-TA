@@ -11,6 +11,7 @@ import mne # MNE-Python for EEG processing
 import matplotlib.pyplot as plt 
 import tensorflow as tf 
 import io
+import cv2
 from io import StringIO
 from pydantic import BaseModel
 import logging
@@ -44,8 +45,8 @@ DPI = 300
 CMAP = "binary"
 
 MODELS = {
-    "model1": os.path.join(MODEL_PATH, "190225_model.h5")
-    # "model2": os.path.join(MODEL_PATH, "dummy_model2.pkl"),
+    "model1": os.path.join(MODEL_PATH, "190225_model.h5"),
+    "model2": os.path.join(MODEL_PATH, "model_6_300_300_1.h5")
     # "model3": os.path.join(MODEL_PATH, "dummy_model3.pkl")
 }
 
@@ -222,8 +223,12 @@ def load_and_stack_images(image_paths, target_size):
     """
     images = []
     for path in image_paths:
-        img = tf.keras.utils.load_img(path, target_size=target_size, color_mode='grayscale')
-        img = tf.keras.utils.img_to_array(img) / 255.0  # Normalize [0, 1]
+        # img = tf.keras.utils.load_img(path, target_size=target_size, color_mode='grayscale')
+        # img = tf.keras.utils.img_to_array(img) / 255.0  # Normalize [0, 1]
+        # images.append(img)
+        img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)  # Pastikan hanya satu channel
+        img = cv2.resize(img, target_size)  # Sesuaikan ukuran
+        img = img / 255.0  # Normalisasi ke [0, 1]
         images.append(img)
 
     # Stack images along the first axis
@@ -275,7 +280,7 @@ async def predict_emotion(file: UploadFile = File(...), model_name: str = "model
             raise HTTPException(status_code=500, detail=f"Model file not found at {model_path}")
         
         model = tf.keras.models.load_model(
-            "models/190225_model.h5", 
+            model_path, 
             custom_objects={"mse": tf.keras.losses.MeanSquaredError()}
         )
         # scaler = joblib.load(scaler_path)
