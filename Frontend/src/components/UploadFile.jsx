@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
-import { useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState, useRef } from "react";
 import { useDropzone } from "react-dropzone";
 import { useDispatch, useSelector } from "react-redux";
-import { uploadEEGFile } from "../connection/emotionSlice";
-import { useNavigate } from "react-router-dom";
+import { uploadEEGFile, setHasNavigated } from "../connection/emotionSlice";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import uploadImage from '../assets/upload_image_icon.png';
 
@@ -13,15 +12,20 @@ const UploadFile = () => {
   const result = useSelector((state) => state.emotion.result);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { selectedModel, status } = useSelector((state) => state.emotion);
+  const location = useLocation();
+  const { selectedModel, status, hasNavigated } = useSelector((state) => state.emotion);
   const [file, setFile] = useState(null);
+  const hasShownToast = useRef(false);
 
   useEffect(() => {
-    if (result) {
+    if (result && !hasShownToast.current && !hasNavigated && location.pathname !== "/result") {
       toast.success("Analysis complete!");
+      hasShownToast.current = true;
+      dispatch(setHasNavigated()); // Simpan status navigasi ke Redux
       navigate("/result");
     }
-  }, [result, navigate]);
+  }, [result, navigate, location, hasNavigated, dispatch]);
+
 
   // Fungsi untuk validasi isi CSV
   const validateCSV = (file) => {

@@ -18,6 +18,7 @@ import logging
 import pyngrok.ngrok as ngrok
 import warnings
 from sklearn.preprocessing import StandardScaler
+from PIL import Image
 
 # Set up logging and suppress warnings
 logging.basicConfig(level=logging.INFO)
@@ -43,15 +44,56 @@ SFREQ = 128
 DPI = 300
 # Constants
 CMAP = "binary"
+# Constants
+CROP_HEIGHT = 12
+# Constants
+STRETCH_HEIGHT = 12
 
-MODELS = {
-    "model1": os.path.join(MODEL_PATH, "190225_model.h5"),
-    "model2": os.path.join(MODEL_PATH, "model_6_300_300_1.h5")
-    # "model3": os.path.join(MODEL_PATH, "dummy_model3.pkl")
-}
+# MODELS = {
+#     "model1": os.path.join(MODEL_PATH, "190225_model.h5"),
+#     "model2": os.path.join(MODEL_PATH, "model_6_300_300_1.h5")
+#     # "model3": os.path.join(MODEL_PATH, "dummy_model3.pkl")
+# }
+
+def load_models_from_directory(model_path):
+    """
+    Mengiterasi semua file dalam folder model_path dan mengembalikan dictionary
+    dengan nama file sebagai kunci dan jalur lengkap sebagai nilai.
+    """
+    models = {}
+    
+    # Mengiterasi semua file dalam folder
+    for filename in os.listdir(model_path):
+        # Memastikan hanya file dengan ekstensi .h5 yang diambil
+        if filename.endswith('.h5'):
+            model_name = filename.split('.')[0]  # Mengambil nama model tanpa ekstensi
+            models[model_name] = os.path.join(model_path, filename)
+        # Mengurutkan model berdasarkan waktu modifikasi (descending)
+        sorted_models = dict(sorted(models.items(), key=lambda item: os.path.getmtime(item[1]), reverse=True))
+    return sorted_models
+MODELS = load_models_from_directory(MODEL_PATH)
 
 # Create app
 app = FastAPI(title="Emotion Detection API")
+
+# Define response models
+class ActualEmotion(BaseModel):
+    valence: float
+    arousal: float
+    dominance: float
+    label: str
+
+class PredictedEmotion(BaseModel):
+    valence: float
+    arousal: float
+    dominance: float
+    label: str
+
+class ResultResponse(BaseModel):
+    success: bool
+    message: str
+    result: dict # Actual and predicted emotions
+    filename: str
 
 # Set up CORS middleware
 app.add_middleware(
@@ -96,53 +138,40 @@ def initialize_mock_models():
 # Initialize models
 initialize_mock_models()
 
-# Define response models
-class EmotionPrediction(BaseModel):
-    valence: float
-    arousal: float
-    dominance: float
-    label: str
-    filename: str
-
-class EmotionResponse(BaseModel):
-    success: bool
-    message: str
-    prediction: Optional[EmotionPrediction] = None
-
 # Helper functions
 def map_to_emotion_label(valence, arousal, dominance):
     """Map valence, arousal and dominance to emotion label"""
     # Simple mapping logic - can be expanded
-    if valence >= 5 and arousal >= 5 and dominance >= 5:
-        return "HVAHD"  # High Valence, High Arousal, High Dominance
-    elif valence >= 5 and arousal >= 5 and dominance < 5:
-        return "HVALD"  # High Valence, High Arousal, Low Dominance
-    elif valence >= 5 and arousal < 5 and dominance >= 5:
+    if valence > 5 and arousal > 5 and dominance > 5:
+        return "HVHAHD"  # High Valence, High Arousal, High Dominance
+    elif valence > 5 and arousal > 5 and dominance <= 5:
+        return "HVHALD"  # High Valence, High Arousal, Low Dominance
+    elif valence > 5 and arousal <= 5 and dominance > 5:
         return "HVLAHD"  # High Valence, Low Arousal, High Dominance
-    elif valence >= 5 and arousal < 5 and dominance < 5:
+    elif valence > 5 and arousal <= 5 and dominance <= 5:
         return "HVLALD"  # High Valence, Low Arousal, Low Dominance
-    elif valence < 5 and arousal >= 5 and dominance >= 5:
-        return "LVAHD"  # Low Valence, High Arousal, High Dominance
-    elif valence < 5 and arousal >= 5 and dominance < 5:
-        return "LVALD"  # Low Valence, High Arousal, Low Dominance
-    elif valence < 5 and arousal < 5 and dominance >= 5:
+    elif valence <= 5 and arousal > 5 and dominance > 5:
+        return "LVHAHD"  # Low Valence, High Arousal, High Dominance
+    elif valence <= 5 and arousal > 5 and dominance <= 5:
+        return "LVHALD"  # Low Valence, High Arousal, Low Dominance
+    elif valence <= 5 and arousal <= 5 and dominance > 5:
         return "LVLAHD"  # Low Valence, Low Arousal, High Dominance
     else:
         return "LVLALD"  # Low Valence, Low Arousal, Low Dominance
 
-def get_emoji_for_label(label):
-    """Get emoji for emotion label"""
-    emoji_map = {
-        "HVAHD": "😀",   # Happy
-        "HVALD": "😎",   # Confident/Cool
-        "HVLAHD": "🧐",  # Curious
-        "HVLALD": "😌",  # Peaceful
-        "LVAHD": "😡",   # Angry
-        "LVALD": "😰",   # Anxious
-        "LVLAHD": "😔",  # Sad
-        "LVLALD": "😪"   # Tired
-    }
-    return emoji_map.get(label, "😐")
+# def get_emoji_for_label(label):
+#     """Get emoji for emotion label"""
+#     emoji_map = {
+#         "HVHAHD": "😀",   # Happy
+#         "HVHALD": "😎",   # Confident/Cool
+#         "HVLAHD": "🧐",  # Curious
+#         "HVLALD": "😌",  # Peaceful
+#         "LVHAHD": "😡",   # Angry
+#         "LVHALD": "😰",   # Anxious
+#         "LVLAHD": "😔",  # Sad
+#         "LVLALD": "😪"   # Tired
+#     }
+#     return emoji_map.get(label, "😐")
 
 def preprocess_eeg_data(df, required_columns=REQUIRED_COLUMNS, sfreq=SFREQ, figsize_width=FIGSIZE_WIDTH, figsize_height=FIGSIZE_HEIGHT, dpi=DPI, cmap=CMAP):
     """
@@ -199,13 +228,36 @@ def preprocess_eeg_data(df, required_columns=REQUIRED_COLUMNS, sfreq=SFREQ, figs
     for signal_index, channel in enumerate(selected_channels):
         tfr_signal = tfr[signal_index]
         filename = os.path.join(video_dir, f"{channel}_wavelet.png")
+        
+        # Buat scalogram dan simpan sementara
+        temp_filename = os.path.join(video_dir, f"temp_{channel}.png")
         plt.figure(figsize=(figsize_width / dpi, figsize_height / dpi), dpi=dpi)
         plt.imshow(np.abs(tfr_signal), aspect='auto', origin='lower', extent=(0, n_times, 1, n_freqs), cmap=cmap)
         plt.axis("off")
-        plt.savefig(filename, dpi=dpi, bbox_inches='tight', pad_inches=0, format="png")
+        plt.savefig(temp_filename, dpi=dpi, bbox_inches='tight', pad_inches=0, format="png")
         plt.close()
-        
-        # Append the filename to the list
+
+        # **Proses Cropping dan Stretching**
+        img = Image.open(temp_filename)
+        width, height = img.size
+
+        # Potong bagian bawah dengan crop_height
+        cropped_img = img.crop((0, 0, width, height - CROP_HEIGHT))
+
+        # Hitung ukuran baru setelah stretching
+        new_height = cropped_img.height + STRETCH_HEIGHT
+        new_size = (cropped_img.width, new_height)
+
+        # Stretch gambar ke ukuran baru
+        stretched_img = cropped_img.resize(new_size, Image.LANCZOS)
+
+        # Simpan hasil akhir
+        stretched_img.save(filename, format="PNG")
+
+        # Hapus file sementara
+        os.remove(temp_filename)
+
+        # Tambahkan ke daftar path gambar
         image_paths.append(filename)
 
     # Load and stack images
@@ -233,13 +285,34 @@ def load_and_stack_images(image_paths, target_size):
 
     # Stack images along the first axis
     stacked_images = tf.stack(images, axis=0)
+    stacked_images = np.expand_dims(stacked_images, axis=0)  # Jadi (1, 6, 300, 300)
+    stacked_images = np.expand_dims(stacked_images, axis=-1) # Jadi (1, 6, 300, 300, 1)
+
     return stacked_images
+
+# Load emotions.json once to avoid reading the file repeatedly
+with open("emotions.json", "r", encoding="utf-8") as file:
+    EMOTIONS_DATA = json.load(file)
+print("📂 Data dari emotions.json:", EMOTIONS_DATA) 
+def get_emotion_details(label):
+    """
+    Cari nama dan emoji berdasarkan label di emotions.json
+    """
+    print(f"🔍 Mencari label: {label}")  # Debugging
+    
+    for emotion in EMOTIONS_DATA:
+        print(f"🆚 Bandingkan dengan: {emotion['label']}")  # Debugging
+        if emotion["label"].strip() == label.strip():  # Hindari spasi tersembunyi
+            return {"name": emotion["name"], "emoji": emotion["emoji"]}
+
+    print("❌ Tidak ditemukan, mengembalikan Unknown")
+    return {"name": "Unknown", "emoji": "❓"}  # Default jika tidak ditemukan
 
 @app.get("/")
 def read_root():
     return {"status": "API is running", "message": "Welcome to Emotion Detection API😆🙌🏻"}
 
-@app.post("/predict", response_model=EmotionResponse)
+@app.post("/predict", response_model=ResultResponse)
 async def predict_emotion(file: UploadFile = File(...), model_name: str = "model1"):
     """
     Predict emotion from EEG data.
@@ -290,32 +363,46 @@ async def predict_emotion(file: UploadFile = File(...), model_name: str = "model
 
         # Predict using model
         prediction = model.predict(features)
-        pred_valence, pred_arousal, pred_dominance = map(float, prediction)
+        # pred_valence, pred_arousal, pred_dominance = map(float, prediction)
+        # pred_valence, pred_arousal, pred_dominance = map(float, prediction.tolist())
+        # pred_valence, pred_arousal, pred_dominance = prediction[0], prediction[1], prediction[2]
+
+        prediction = np.squeeze(prediction)
+        pred_valence, pred_arousal, pred_dominance = prediction
 
         # Tentukan label berdasarkan prediksi
-        pred_label = map_to_emotion_label(pred_valence, pred_arousal, pred_dominance)
         actual_label = map_to_emotion_label(actual_valence, actual_arousal, actual_dominance) if actual_valence is not None else "Unknown"
+        pred_label = map_to_emotion_label(pred_valence, pred_arousal, pred_dominance)
+        
+        # Ambil nama dan emoji dari emotions.json
+        actual_details = get_emotion_details(actual_label)
+        predicted_details = get_emotion_details(pred_label)
 
         # Return response
-        return {
+        response_data = {
             "success": True,
             "message": "Prediction successful",
-            "prediction": {
+            "result": {
                 "actual": {
-                    "valence": actual_valence,
-                    "arousal": actual_arousal,
-                    "dominance": actual_dominance,
-                    "label": actual_label
+                    "valence": float(actual_valence),
+                    "arousal": float(actual_arousal),
+                    "dominance": float(actual_dominance),
+                    "label": actual_label,
+                    "name": actual_details["name"],  # Tambahkan nama
+                    "emoji": actual_details["emoji"]  # Tambahkan emoji
                 },
                 "predicted": {
-                    "valence": pred_valence,
-                    "arousal": pred_arousal,
-                    "dominance": pred_dominance,
-                    "label": pred_label
-                },
-                "filename": file.filename
-            }
+                    "valence": float(pred_valence),  # Konversi np.float32 ke float
+                    "arousal": float(pred_arousal),
+                    "dominance": float(pred_dominance),
+                    "label": pred_label,
+                    "name": predicted_details["name"],  # Tambahkan nama
+                    "emoji": predicted_details["emoji"]  # Tambahkan emoji
+                }
+            },
+            "filename": file.filename  # Pastikan filename berada di luar result
         }
+        return response_data
 
     except Exception as e:
         logger.error(f"Error during prediction: {str(e)}", exc_info=True)

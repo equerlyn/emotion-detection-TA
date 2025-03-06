@@ -50,6 +50,7 @@ export const uploadEEGFile = createAsyncThunk(
       );
       
       if (response.data.success) {
+        console.log(response.data);
         return response.data; 
       } else {
         return rejectWithValue(response.data.message || "Prediction failed");
@@ -69,15 +70,19 @@ const emotionSlice = createSlice({
     result: null, // Tempat menyimpan hasil prediksi
     status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
     error: null,
+    hasNavigated: false,
   },
   reducers: {
     setSelectedModel: (state, action) => {
       state.selectedModel = action.payload;
     },
-    resetPrediction: (state) => {
-      state.prediction = null;
+    resetResult: (state) => {
+      state.result = null;
       state.status = 'idle';
       state.error = null;
+    },
+    setHasNavigated: (state) => {
+      state.hasNavigated = true;  // ✅ Set navigasi ke `true`
     },
   },
   extraReducers: (builder) => {
@@ -117,6 +122,7 @@ const emotionSlice = createSlice({
       })
       .addCase(uploadEEGFile.fulfilled, (state, action) => {
         state.status = 'succeeded';
+        console.log("Redux received:", action.payload); // Debugging
         state.result = action.payload;
       })
       .addCase(uploadEEGFile.rejected, (state, action) => {
@@ -126,6 +132,6 @@ const emotionSlice = createSlice({
   },
 });
 
-export const { setSelectedModel, resetPrediction } = emotionSlice.actions;
+export const { setSelectedModel, resetResult, setHasNavigated } = emotionSlice.actions;
 
 export default emotionSlice.reducer;

@@ -10,7 +10,9 @@ const Navbar = () => {
     <div className="fixed top-0 left-0 w-full z-50 flex justify-between items-center bg-gray-100 bg-opacity-50 px-4 py-4 backdrop-blur-sm">
       {/* Judul atau Label Navigasi */}
       <h1 className="text-2xl font-bold french-blue">
-        <Link to="/">Emotion Detection</Link>
+        <Link to="/" onClick={() => console.log("Home clicked!")}>
+          Emotion Detection
+        </Link>
       </h1>
 
       {/* Link Navigasi */}

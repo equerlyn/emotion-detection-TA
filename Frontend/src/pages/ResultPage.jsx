@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
@@ -10,20 +10,30 @@ const ResultPage = () => {
   const navigate = useNavigate();
 
   // Pastikan `result` dan `actual` serta `predicted` ada sebelum diakses
-  const actual = result?.actual ?? { valence: 0, arousal: 0, dominance: 0, label: "Unknown" };
-  const predicted = result?.predicted ?? { valence: 0, arousal: 0, dominance: 0, label: "Unknown" };
+  const actual = result?.result?.actual ?? { valence: 0, arousal: 0, dominance: 0, label: "Unknown" };
+  const predicted = result?.result?.predicted ?? { valence: 0, arousal: 0, dominance: 0, label: "Unknown" };
 
+  const [loading, setLoading] = useState(true);
 
-  // Redirect jika tidak ada data hasil prediksi
   useEffect(() => {
-    console.log("Result updated:", result);
     if (!result) {
-      // navigate("/");
+      setLoading(true);
+      setTimeout(() => navigate("/"), 2000); // Redirect ke home setelah 2 detik jika result tidak ada
+    } else {
+      setLoading(false);
     }
   }, [result, navigate]);
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <h1 className="text-2xl font-bold">Loading...</h1>
+      </div>
+    );
+  }
+
   return (
-    <div className="overflow-hidden flex flex-col h-screen">
+    <div className="flex flex-col h-screen">
       <Navbar />
       <div className="pl-4 bg flex flex-col items-center justify-center h-full">
         <ResultText />

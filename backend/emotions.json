@@ -1,12 +1,12 @@
 [
   {
-      "label": "HVAHD",
+      "label": "HVHAHD",
       "name": "Happy",
       "emoji": "😀",
       "description": "High valence, high arousal, high dominance. Feeling happy, excited, and in control."
   },
   {
-      "label": "HVALD",
+      "label": "HVHALD",
       "name": "Confident",
       "emoji": "😎",
       "description": "High valence, high arousal, low dominance. Feeling positive and excited but not necessarily in control."
@@ -24,13 +24,13 @@
       "description": "High valence, low arousal, low dominance. Feeling positive and calm but not in control."
   },
   {
-      "label": "LVAHD",
+      "label": "LVHAHD",
       "name": "Angry",
       "emoji": "😡",
       "description": "Low valence, high arousal, high dominance. Feeling negative, aroused, and in control."
   },
   {
-      "label": "LVALD",
+      "label": "LVHALD",
       "name": "Anxious",
       "emoji": "😰",
       "description": "Low valence, high arousal, low dominance. Feeling negative, aroused, and not in control."

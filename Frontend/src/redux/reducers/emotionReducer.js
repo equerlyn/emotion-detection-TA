@@ -56,7 +56,10 @@ const emotionSlice = createSlice({
       state.isProcessing = false;
       state.error = action.payload;
     },
-    resetState: () => initialState
+    resetState: () => initialState,
+    setHasNavigated(state) {
+      state.hasNavigated = true;
+    },
   }
 });
 

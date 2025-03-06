@@ -14,7 +14,7 @@ function App() {
   return (
     <Provider store={store}>
       <Router>
-        <ToastContainer position="top-right" autoClose={5000} />
+        <ToastContainer position="top-right" autoClose={2000} />
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/result" element={<ResultPage />} />
