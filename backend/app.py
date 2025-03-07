@@ -60,16 +60,28 @@ def load_models_from_directory(model_path):
     Mengiterasi semua file dalam folder model_path dan mengembalikan dictionary
     dengan nama file sebagai kunci dan jalur lengkap sebagai nilai.
     """
+    if not os.path.exists(model_path):  # Pastikan folder ada
+        print(f"Folder {model_path} tidak ditemukan.")
+        return {}
+
     models = {}
-    
-    # Mengiterasi semua file dalam folder
+
     for filename in os.listdir(model_path):
-        # Memastikan hanya file dengan ekstensi .h5 yang diambil
         if filename.endswith('.h5'):
-            model_name = filename.split('.')[0]  # Mengambil nama model tanpa ekstensi
-            models[model_name] = os.path.join(model_path, filename)
-        # Mengurutkan model berdasarkan waktu modifikasi (descending)
-        sorted_models = dict(sorted(models.items(), key=lambda item: os.path.getmtime(item[1]), reverse=True))
+            model_name = filename.split('.')[0]
+            file_path = os.path.join(model_path, filename)
+            
+            try:
+                models[model_name] = file_path
+            except Exception as e:
+                print(f"Gagal memproses file {filename}: {e}")
+
+    # Mengurutkan model berdasarkan waktu modifikasi terbaru (descending)
+    sorted_models = dict(sorted(models.items(), key=lambda item: os.path.getmtime(item[1]), reverse=True))
+    
+    if not sorted_models:
+        print("Tidak ada model yang ditemukan dalam folder.")
+    
     return sorted_models
 MODELS = load_models_from_directory(MODEL_PATH)
 
@@ -417,7 +429,7 @@ def get_models():
 def get_emotions():
     """Get list of emotion labels with descriptions from an external file"""
     try:
-        with open("emotions.json", "r") as file:
+        with open("emotions.json", "r", encoding="utf-8") as file:
             emotions = json.load(file)
         return {"success": True, "emotions": emotions}
     except FileNotFoundError:

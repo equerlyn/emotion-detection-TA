@@ -83,3 +83,21 @@ export const processFile = () => async (dispatch, getState) => {
     return false;
   }
 };
+
+export const fetchEmotions = () => async (dispatch) => {
+  dispatch(setEmotionsLoading());
+
+  try {
+    const response = await axios.get(`${API_URL}/emotions`);
+    console.log("API Response:", response.data); // Debugging
+
+    if (response.data.success) {
+      return response.data.emotions; // Pastikan ini mengambil `emotions`
+    } else {
+      return rejectWithValue(response.data.message || "Failed to fetch emotions");
+    }
+  } catch (error) {
+    console.error("Error fetching emotions:", error);
+    return rejectWithValue(error.response?.data || "Failed to fetch emotions");
+  }
+};

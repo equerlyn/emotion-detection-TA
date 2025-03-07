@@ -89,14 +89,14 @@ const emotionSlice = createSlice({
     builder
       // Fetch emotions cases
       .addCase(fetchEmotions.pending, (state) => {
-        state.status = 'loading';
+        state.status = "loading";
       })
       .addCase(fetchEmotions.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.emotions = action.payload.emotions;
+        state.status = "succeeded";
+        state.emotions = action.payload; // Simpan data ke state
       })
       .addCase(fetchEmotions.rejected, (state, action) => {
-        state.status = 'failed';
+        state.status = "failed";
         state.error = action.payload;
       })
       

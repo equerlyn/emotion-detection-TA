@@ -5,6 +5,8 @@ const initialState = {
   file: null,
   isUploading: false,
   isProcessing: false,
+  emotions: [],  // Tambahkan ini untuk menyimpan data emosi
+  status: 'idle', // idle | loading | succeeded | failed
   error: null,
   result: {
     actual: {
@@ -59,6 +61,17 @@ const emotionSlice = createSlice({
     resetState: () => initialState,
     setHasNavigated(state) {
       state.hasNavigated = true;
+    },
+    setEmotions: (state, action) => {
+      state.emotions = action.payload;
+      state.status = 'succeeded';
+    },
+    setEmotionsLoading: (state) => {
+      state.status = 'loading';
+    },
+    setEmotionsError: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload;
     },
   }
 });
