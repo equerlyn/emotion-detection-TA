@@ -39,7 +39,7 @@ const Dropdown = () => {
           </option>
         ))}
       </select>
-      {status === 'loading' && <span className="text-sm text-gray-500">Loading models...</span>}
+      {status === 'loading' && models.length <=0 && <span className="text-sm text-gray-500">Loading models...</span>}
     </div>
   );
 };
