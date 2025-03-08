@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .raisin-black {
   color: #272838 !important; 
 }

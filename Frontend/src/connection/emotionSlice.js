@@ -50,7 +50,6 @@ export const uploadEEGFile = createAsyncThunk(
       );
       
       if (response.data.success) {
-        console.log(response.data);
         return response.data; 
       } else {
         return rejectWithValue(response.data.message || "Prediction failed");
@@ -122,7 +121,6 @@ const emotionSlice = createSlice({
       })
       .addCase(uploadEEGFile.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        console.log("Redux received:", action.payload); // Debugging
         state.result = action.payload;
       })
       .addCase(uploadEEGFile.rejected, (state, action) => {

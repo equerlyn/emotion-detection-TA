@@ -5,8 +5,10 @@ import { uploadEEGFile, setHasNavigated } from "../connection/emotionSlice";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import uploadImage from '../assets/upload_image_icon.png';
+import loadingGif from "../assets/loading.gif";
 
 const REQUIRED_COLUMNS = ["FZ", "PO4", "P4", "T8", "AF3", "F3"];
+const EMOJIS = ["🧐", "😎", "😀", "😌", "😡", "😰", "😔", "😪"];
 
 const UploadFile = () => {
   const result = useSelector((state) => state.emotion.result);
@@ -14,8 +16,10 @@ const UploadFile = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { selectedModel, status, hasNavigated } = useSelector((state) => state.emotion);
-  const [file, setFile] = useState(null);
   const hasShownToast = useRef(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [emojiIndex, setEmojiIndex] = useState(0);
+  const [file, setFile] = useState(null);
 
   useEffect(() => {
     if (result && !hasShownToast.current && !hasNavigated && location.pathname !== "/result") {
@@ -26,6 +30,14 @@ const UploadFile = () => {
     }
   }, [result, navigate, location, hasNavigated, dispatch]);
 
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setEmojiIndex((prevIndex) => (prevIndex + 1) % EMOJIS.length);
+      }, 500);
+      return () => clearInterval(interval);
+    }
+  }, [isLoading]);
 
   // Fungsi untuk validasi isi CSV
   const validateCSV = (file) => {
@@ -80,46 +92,29 @@ const UploadFile = () => {
     maxFiles: 1
   });
 
-  // const handleUpload = async () => {
-  //   if (!file) {
-  //     toast.error('Please select a file to upload');
-  //     return;
-  //   }
-  
-  //   if (!selectedModel) {
-  //     toast.error('Please select a model');
-  //     return;
-  //   }
-  
-  //   try {
-  //     const response = await dispatch(uploadEEGFile({ file, modelName: selectedModel })).unwrap();
-      
-  //     toast.success('Analysis complete!');
-      
-  //     // Tambahkan jeda waktu jika Redux state perlu waktu untuk berubah
-  //     setTimeout(() => {
-  //       console.log("Executing navigate('/result')..."); // Debugging log
-  //       navigate('/result');
-  //     }, 500);
-      
-  //   } catch (error) {
-  //     toast.error(`Error: ${error.message || 'Failed to process file'}`);
-  //   }
-  // };  
-
   const handleUpload = async () => {
     if (!file) {
       toast.error("Please select a file to upload");
       return;
     }
-
+  
     if (!selectedModel) {
       toast.error("Please select a model");
       return;
     }
-
-    dispatch(uploadEEGFile({ file, modelName: selectedModel }));
-  };
+  
+    setIsLoading(true); // Tampilkan modal loading
+  
+    try {
+      await dispatch(uploadEEGFile({ file, modelName: selectedModel })).unwrap();
+      toast.success("Analysis complete!");
+      navigate("/result");
+    } catch (error) {
+      toast.error(`Error: ${error.message || "Failed to process file"}`);
+    } finally {
+      setIsLoading(false); // Sembunyikan modal setelah selesai
+    }
+  };  
 
   return (
     <div className="flex flex-col items-center w-full">
@@ -157,7 +152,7 @@ const UploadFile = () => {
         </button>
       </div>
       
-      {file && (
+      {/* {file && (
         <button
           type="button"
           disabled={status === 'loading' || !selectedModel}
@@ -170,7 +165,36 @@ const UploadFile = () => {
         >
           {status === 'loading' ? 'Processing...' : 'Analyze Emotion'}
         </button>
-      )}
+      )} */}
+
+        {/* Tombol Upload */}
+        {file && (
+          <button
+            type="button"
+            disabled={status === "loading" || !selectedModel}
+            className={`mt-4 px-6 py-3 text-white font-medium rounded-full ${
+              status === "loading" || !selectedModel
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
+            onClick={handleUpload}
+          >
+            Analyze Emotion
+          </button>
+        )}
+
+        {/* Modal Loading */}
+        {isLoading && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white p-10 rounded-lg shadow-lg flex flex-col items-center w-96 h-42 relative">
+              <div className="relative">
+                <img src={loadingGif} alt="Loading..." className="w-24 h-24 relative z-20" />
+                <span className="absolute inset-0 flex items-center justify-center text-6xl font-bold text-black z-10">{EMOJIS[emojiIndex]}</span>
+              </div>
+              <p className="mt-5 text-lg text-french-blue font-medium">Analyzing...</p>
+            </div>
+          </div>  
+        )}
     </div>
   );
 };

@@ -12,7 +12,6 @@ const Dropdown = () => {
 
   const handleChange = (event) => {
     dispatch(setSelectedModel(event.target.value));
-    console.log("Model selected:", event.target.value);
   };
 
   return (
