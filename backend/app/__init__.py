@@ -12,6 +12,3 @@ app.include_router(root.router)
 app.include_router(predict.router, prefix="/predict", tags=["Prediction"])
 app.include_router(models.router, prefix="/models", tags=["Models"])
 app.include_router(emotions.router, prefix="/emotions", tags=["Emotions"])
-@app.get("/debug_routes")
-def debug_routes():
-  return {"routes": [route.path for route in app.routes]}

@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 import json
+import app.utils.constants as constants  
 
 router = APIRouter()
 
@@ -7,7 +8,7 @@ router = APIRouter()
 def get_emotions():
   """Get list of emotion labels with descriptions from an external file"""
   try:
-      with open("emotions.json", "r", encoding="utf-8") as file:
+      with open(constants.EMOTIONS_PATH, "r", encoding="utf-8") as file:
           emotions = json.load(file)
       return {"success": True, "emotions": emotions}
   except FileNotFoundError:
