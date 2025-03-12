@@ -18,11 +18,11 @@ const ResultText = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-36 mb-8">
-      <h1 className="text-xl font-semibold text-raisin-black mb-4">Your emotion is</h1>
+    <div className="flex flex-col items-center justify-center h-36">
+      <h1 className="text-xl font-semibold text-raisin-black mb-2">Your emotion is</h1>
       <div className="flex items-center space-x-4">
         <span className="text-5xl">{emoji}</span>
-        <h2 className="text-4xl font-bold text-sunglow">{emotionName}</h2>
+        <h2 className="text-4xl font-bold french-blue">{emotionName}</h2>
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import InfoCard from "./InfoCard";
  */
 const Navbar = () => {
   return (
-    <div className="fixed top-0 left-0 w-full z-50 flex justify-between items-center bg-gray-100 bg-opacity-50 px-4 py-4 backdrop-blur-sm">
+    <div className="fixed top-0 left-0 w-full z-50 flex justify-between items-center bg-blue-200 bg-opacity-50 px-4 py-4 backdrop-blur-sm">
       {/* Judul atau Label Navigasi */}
       <h1 className="text-2xl font-bold french-blue">
         <Link to="/">

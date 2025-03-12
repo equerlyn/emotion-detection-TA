@@ -5,48 +5,9 @@ import {
   uploadSuccess, 
   uploadFailure, 
   startProcessing, 
-  setResults, 
-  processingFailure 
+  setResults
 } from '../reducers/emotionReducer';
 
-// Mock API service - in a real app, you would use actual API calls
-const mockApiUpload = (file, modelId) => {
-  return new Promise((resolve, reject) => {
-    // Simulate network delay
-    setTimeout(() => {
-      if (!file || !modelId) {
-        reject(new Error('Missing file or model selection'));
-      } else {
-        resolve({ success: true, fileId: '123456' });
-      }
-    }, 1000);
-  });
-};
-
-const mockApiProcess = (fileId, modelId) => {
-  return new Promise((resolve) => {
-    // Simulate processing
-    setTimeout(() => {
-      resolve({
-        actual: {
-          valence: 7.5,
-          arousal: 8,
-          dominance: 2.3,
-          label: "HVALD"
-        },
-        predicted: {
-          valence: 7.2,
-          arousal: 7.8,
-          dominance: 2.5,
-          label: "HVALD"
-        },
-        emoji: "😎"
-      });
-    }, 2000);
-  });
-};
-
-// Thunk for handling model selection
 export const selectModel = (modelId) => (dispatch) => {
   dispatch(setSelectedModel(modelId));
 };

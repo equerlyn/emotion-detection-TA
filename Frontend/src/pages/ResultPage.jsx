@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import ResultText from '../components/ResultText';
-import ResultCard from '../components/ResultCard';
+import ResultComparison from '../components/ResultComparison';
 
 const ResultPage = () => {
   const result = useSelector(state => state.emotion.result);
@@ -37,7 +37,7 @@ const ResultPage = () => {
       <Navbar />
       <div className="pl-4 bg flex flex-col items-center justify-center h-full">
         <ResultText />
-        <div className="grid grid-cols-2 w-full justify-items-center">
+        {/* <div className="grid grid-cols-2 w-full justify-items-center">
           <ResultCard 
             valence={actual.valence} 
             arousal={actual.arousal} 
@@ -52,7 +52,9 @@ const ResultPage = () => {
             label={predicted.label} 
             type="predicted" 
           />
-        </div>
+        </div> */}
+
+        <ResultComparison actual={actual} predicted={predicted} />
       </div>
     </div>
   );

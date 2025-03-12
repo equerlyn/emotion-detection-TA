@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// const API_URL = import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:8000';
 const API_URL =  'http://127.0.0.1:8000' || 'http://localhost:8000';
 
 // Async action to fetch all emotions
