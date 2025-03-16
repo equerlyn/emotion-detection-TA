@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  selectedModel: '',
   file: null,
   isUploading: false,
   isProcessing: false,
@@ -29,9 +28,6 @@ const emotionSlice = createSlice({
   name: 'emotion',
   initialState,
   reducers: {
-    setSelectedModel: (state, action) => {
-      state.selectedModel = action.payload;
-    },
     setFile: (state, action) => {
       state.file = action.payload;
     },
@@ -77,7 +73,6 @@ const emotionSlice = createSlice({
 });
 
 export const {
-  setSelectedModel,
   setFile,
   startUpload,
   uploadSuccess,

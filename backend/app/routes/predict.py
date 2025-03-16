@@ -1,16 +1,16 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from app.models import Result
-from app.utils import constants, data_loading, eeg_preprocessing, emotion_mapping, model_loading
+from app.utils import constants, eeg_preprocessing, emotion_mapping, model_loading
 import pandas as pd
 import numpy as np
 import logging
-import io
 from io import StringIO
 
 router = APIRouter()
 
 @router.post("/", response_model=Result)
-async def predict_emotion(file: UploadFile = File(...), model_name: str = "model1"):
+async def predict_emotion(file: UploadFile = File(...)):
+  print("DEBUG: Fungsi predict_emotion dipanggil")  # Debugging awal
   logger = logging.getLogger(__name__)
   
   # Cek ukuran file
@@ -25,10 +25,6 @@ async def predict_emotion(file: UploadFile = File(...), model_name: str = "model
   if not file.filename.endswith('.csv'):
     raise HTTPException(status_code=400, detail="Only CSV files are allowed.")
   
-  # Validasi keberadaan model
-  if model_name not in constants.MODELS:
-    raise HTTPException(status_code=404, detail=f"Model {model_name} not found. Available models: {', '.join(constants.MODELS.keys())}")
-  
   try:
     df = pd.read_csv(StringIO(file.file.read().decode('utf-8')))
     
@@ -39,25 +35,20 @@ async def predict_emotion(file: UploadFile = File(...), model_name: str = "model
 
     # Preprocessing EEG data
     features, _ = eeg_preprocessing.preprocess_eeg_data(df)
-
-    # Load model dan scaler
-    model_path = constants.MODELS[model_name]
-    model = model_loading.load_model(model_path)
+    print("A dasdasd asdasd")
+    model = model_loading.load_model(constants.MODELS)
     
     # Predict using model
     prediction = model.predict(features)
     prediction = np.squeeze(prediction)
     pred_valence, pred_arousal, pred_dominance = prediction
 
-    # Tentukan label berdasarkan prediksi
     actual_label = emotion_mapping.map_to_emotion_label(actual_valence, actual_arousal, actual_dominance) if actual_valence is not None else "Unknown"
     pred_label = emotion_mapping.map_to_emotion_label(pred_valence, pred_arousal, pred_dominance)
     
-    # Ambil nama dan emoji dari emotions.json
     actual_details = emotion_mapping.get_emotion_details(actual_label)
     predicted_details = emotion_mapping.get_emotion_details(pred_label)
 
-    # Return response
     response_data = {
         "success": True,
         "message": "Prediction successful",

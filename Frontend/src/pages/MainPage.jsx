@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { resetState } from '../redux/reducers/emotionReducer';
 import Navbar from '../components/Navbar';
-import Dropdown from '../components/Dropdown';
 import UploadFile from '../components/UploadFile';
 
 const MainPage = () => {
@@ -22,10 +21,7 @@ const MainPage = () => {
         </h2>
         <p className="text-gray-600 mb-6">Add your EEG</p>
       </div>
-      <div className="pl-24 bg">
-        <Dropdown />
-      </div>
-      <div className="flex flex-1 flex-col items-center justify-center bg pb-24 px-24">
+      <div className="bg pb-24 px-24">
         <UploadFile />
       </div>
     </div>

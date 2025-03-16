@@ -15,7 +15,7 @@ const UploadFile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { selectedModel, status, hasNavigated } = useSelector((state) => state.emotion);
+  const { status, hasNavigated } = useSelector((state) => state.emotion);
   const hasShownToast = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const [emojiIndex, setEmojiIndex] = useState(0);
@@ -39,7 +39,6 @@ const UploadFile = () => {
     }
   }, [isLoading]);
 
-  // Fungsi untuk validasi isi CSV
   const validateCSV = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -52,7 +51,6 @@ const UploadFile = () => {
           return;
         }
 
-        // Ambil header baris pertama
         const headers = lines[0].split(",");
         const missingColumns = REQUIRED_COLUMNS.filter(col => !headers.includes(col));
 
@@ -97,22 +95,16 @@ const UploadFile = () => {
       toast.error("Please select a file to upload");
       return;
     }
-  
-    if (!selectedModel) {
-      toast.error("Please select a model");
-      return;
-    }
-  
-    setIsLoading(true); // Tampilkan modal loading
+    setIsLoading(true); 
   
     try {
-      await dispatch(uploadEEGFile({ file, modelName: selectedModel })).unwrap();
+      await dispatch(uploadEEGFile({ file })).unwrap();
       toast.success("Analysis complete!");
       navigate("/result");
     } catch (error) {
       toast.error(`Error: ${error.message || "Failed to process file"}`);
     } finally {
-      setIsLoading(false); // Sembunyikan modal setelah selesai
+      setIsLoading(false); 
     }
   };  
 
@@ -151,50 +143,35 @@ const UploadFile = () => {
           Browse File
         </button>
       </div>
-      
-      {/* {file && (
+
+      {/* Tombol Upload */}
+      {file && (
         <button
           type="button"
-          disabled={status === 'loading' || !selectedModel}
+          disabled={status === "loading"}
           className={`mt-4 px-6 py-3 text-white font-medium rounded-full ${
-            status === 'loading' || !selectedModel
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-700'
+            status === "loading"
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
           }`}
           onClick={handleUpload}
         >
-          {status === 'loading' ? 'Processing...' : 'Analyze Emotion'}
+          Analyze Emotion
         </button>
-      )} */}
+      )}
 
-        {/* Tombol Upload */}
-        {file && (
-          <button
-            type="button"
-            disabled={status === "loading" || !selectedModel}
-            className={`mt-4 px-6 py-3 text-white font-medium rounded-full ${
-              status === "loading" || !selectedModel
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-            }`}
-            onClick={handleUpload}
-          >
-            Analyze Emotion
-          </button>
-        )}
-
-        {/* Modal Loading */}
-        {isLoading && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-10 rounded-lg shadow-lg flex flex-col items-center w-96 h-42 relative">
-              <div className="relative">
-                <img src={loadingGif} alt="Loading..." className="w-24 h-24 relative z-20" />
-                <span className="absolute inset-0 flex items-center justify-center text-6xl font-bold text-black z-10">{EMOJIS[emojiIndex]}</span>
-              </div>
-              <p className="mt-5 text-lg text-french-blue font-medium">Analyzing...</p>
+      {/* Modal Loading */}
+      {isLoading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-10 rounded-lg shadow-lg flex flex-col items-center w-96 h-42 relative">
+            <div className="relative">
+              <img src={loadingGif} alt="Loading..." className="w-24 h-24 relative z-20" />
+              <span className="absolute inset-0 flex items-center justify-center text-6xl font-bold text-black z-10">{EMOJIS[emojiIndex]}</span>
             </div>
-          </div>  
-        )}
+            <p className="mt-5 text-lg text-french-blue font-medium">Analyzing...</p>
+          </div>
+        </div>  
+      )}
     </div>
   );
 };

@@ -1,5 +1,4 @@
 import { 
-  setSelectedModel, 
   setFile, 
   startUpload, 
   uploadSuccess, 
@@ -7,10 +6,6 @@ import {
   startProcessing, 
   setResults
 } from '../reducers/emotionReducer';
-
-export const selectModel = (modelId) => (dispatch) => {
-  dispatch(setSelectedModel(modelId));
-};
 
 // Thunk for handling file upload
 export const uploadFile = (file) => (dispatch, getState) => {
@@ -21,23 +16,22 @@ export const uploadFile = (file) => (dispatch, getState) => {
 
 // Thunk for processing the file
 export const processFile = () => async (dispatch, getState) => {
-  const { file, selectedModel } = getState().emotion;
+  const { file } = getState().emotion;
   
-  if (!file || !selectedModel) {
-    dispatch(uploadFailure('Please select a model and upload a file'));
+  if (!file) {
+    dispatch(uploadFailure('Please upload a file'));
     return;
   }
   
   try {
     dispatch(startUpload());
-    const uploadResult = await mockApiUpload(file, selectedModel);
+    const uploadResult = await mockApiUpload(file);
     dispatch(uploadSuccess());
     
     dispatch(startProcessing());
-    const processResult = await mockApiProcess(uploadResult.fileId, selectedModel);
+    const processResult = await mockApiProcess(uploadResult.fileId);
     dispatch(setResults(processResult));
-    
-    // Navigate to results page could be handled here with history.push
+
     return true;
   } catch (error) {
     dispatch(uploadFailure(error.message));
