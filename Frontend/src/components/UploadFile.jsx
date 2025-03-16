@@ -15,7 +15,7 @@ const UploadFile = () => {
   const result = useSelector((state) => state.emotion.result);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isProcessing, hasNavigated } = useSelector((state) => state.emotion);
+  const { isProcessing, hasNavigated, status } = useSelector((state) => state.emotion);
   const hasShownToast = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const [emojiIndex, setEmojiIndex] = useState(0);
