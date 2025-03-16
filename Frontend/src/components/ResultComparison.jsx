@@ -1,15 +1,12 @@
 import { CheckCircle, XCircle } from "lucide-react";
 
 export default function ResultComparison({ actual, predicted }) {
-  // Fungsi untuk membulatkan angka hingga 2 desimal
   const roundToTwo = (num) => num.toFixed(2);
 
-  // Fungsi untuk menentukan warna berdasarkan kategori High/Low
   const getCategoryColor = (value) => {
     return value > 5 ? "text-green-600 font-bold" : "text-red-600 font-bold";
   };
 
-  // Fungsi untuk menentukan ikon yang akan ditampilkan
   const getMatchIcon = (actualValue, predictedValue) => {
     if (actualValue > 5 && predictedValue > 5) {
       return <CheckCircle className="text-green-500" size={24} />;
@@ -22,12 +19,10 @@ export default function ResultComparison({ actual, predicted }) {
   return (
     <div className="w-full max-w-6xl p-8 shadow-2xl rounded-3xl bg-white border border-gray-300">
       <div className="grid grid-cols-3 text-center font-medium text-lg">
-        {/* Header */}
         <div className="text-2xl font-bold border-b-2 border-gray-300 pb-2">Actual</div>
         <div className="text-2xl font-bold border-b-2 border-gray-300 pb-2">Predicted</div>
         <div className="text-2xl font-bold border-b-2 border-gray-300 pb-2">Match</div>
 
-        {/* Valence */}
         <div className="py-4 border-b border-gray-200">
           <span className="text-gray-500 text-lg">Valence</span>
           <p className="text-2xl font-semibold">

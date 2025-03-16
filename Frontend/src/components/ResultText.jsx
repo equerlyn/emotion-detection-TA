@@ -5,7 +5,7 @@ const ResultText = () => {
   const result = useSelector(state => state.emotion.result);
 
   // Pastikan nilai `result` tidak `undefined` sebelum mengakses propertinya
-  const emotionName = result?.result?.predicted?.name ?? null;
+  const emotionName = result?.predicted?.name ?? null;
   const emoji = result?.emoji ?? '🤔';
 
   // Jika hasil prediksi belum tersedia, tampilkan pesan "Processing..."

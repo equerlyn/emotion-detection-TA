@@ -1,8 +1,9 @@
 import React, { useEffect, useCallback, useState, useRef } from "react";
 import { useDropzone } from "react-dropzone";
 import { useDispatch, useSelector } from "react-redux";
-import { uploadEEGFile, setHasNavigated } from "../connection/emotionSlice";
-import { useNavigate, useLocation } from "react-router-dom";
+import { uploadFile } from '../redux/actions/emotionActions';
+import { setHasNavigated } from '../redux/reducers/emotionReducer';
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import uploadImage from '../assets/upload_image_icon.png';
 import loadingGif from "../assets/loading.gif";
@@ -14,21 +15,20 @@ const UploadFile = () => {
   const result = useSelector((state) => state.emotion.result);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
-  const { status, hasNavigated } = useSelector((state) => state.emotion);
+  const { isProcessing, hasNavigated } = useSelector((state) => state.emotion);
   const hasShownToast = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const [emojiIndex, setEmojiIndex] = useState(0);
   const [file, setFile] = useState(null);
 
   useEffect(() => {
-    if (result && !hasShownToast.current && !hasNavigated && location.pathname !== "/result") {
+    if (result && result.predicted && !hasShownToast.current && !hasNavigated && !isProcessing) {
       toast.success("Analysis complete!");
       hasShownToast.current = true;
-      dispatch(setHasNavigated()); // Simpan status navigasi ke Redux
+      dispatch(setHasNavigated());
       navigate("/result");
     }
-  }, [result, navigate, location, hasNavigated, dispatch]);
+  }, [result, isProcessing, navigate, hasNavigated, dispatch]);
 
   useEffect(() => {
     if (isLoading) {
@@ -98,7 +98,7 @@ const UploadFile = () => {
     setIsLoading(true); 
   
     try {
-      await dispatch(uploadEEGFile({ file })).unwrap();
+      await dispatch(uploadFile(file)).unwrap();
       toast.success("Analysis complete!");
       navigate("/result");
     } catch (error) {
@@ -148,15 +148,15 @@ const UploadFile = () => {
       {file && (
         <button
           type="button"
-          disabled={status === "loading"}
+          disabled={!file || isLoading}
           className={`mt-4 px-6 py-3 text-white font-medium rounded-full ${
             status === "loading"
               ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
+              : "bg-blue-600 hover:bg-blue-800"
           }`}
           onClick={handleUpload}
         >
-          Analyze Emotion
+           {isLoading ? "Processing..." : "Analyze Emotion"}
         </button>
       )}
 

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchEmotions } from '../connection/emotionSlice';
+import { fetchEmotions } from '../redux/actions/emotionActions';
 import Navbar from '../components/Navbar.jsx';
 import EmoCard from '../components/EmoCard.jsx';
 
@@ -8,7 +8,7 @@ const EmoPage = () => {
   const dispatch = useDispatch();
   const { emotions, status, error } = useSelector((state) => state.emotion);
   
-  const emotionList = emotions?.emotions || [];
+  const emotionList = emotions || [];
 
   useEffect(() => {
     dispatch(fetchEmotions());

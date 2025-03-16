@@ -1,57 +1,39 @@
-import { 
-  setFile, 
-  startUpload, 
-  uploadSuccess, 
-  uploadFailure, 
-  startProcessing, 
-  setResults
-} from '../reducers/emotionReducer';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
-// Thunk for handling file upload
-export const uploadFile = (file) => (dispatch, getState) => {
-  if (!file) return;
-  
-  dispatch(setFile(file));
-};
+const API_URL = 'http://127.0.0.1:8000' || 'http://localhost:8000';
 
-// Thunk for processing the file
-export const processFile = () => async (dispatch, getState) => {
-  const { file } = getState().emotion;
-  
-  if (!file) {
-    dispatch(uploadFailure('Please upload a file'));
-    return;
-  }
-  
-  try {
-    dispatch(startUpload());
-    const uploadResult = await mockApiUpload(file);
-    dispatch(uploadSuccess());
-    
-    dispatch(startProcessing());
-    const processResult = await mockApiProcess(uploadResult.fileId);
-    dispatch(setResults(processResult));
+export const uploadFile = createAsyncThunk(
+  'emotion/uploadFile',
+  async (file, { rejectWithValue }) => {
+    if (!file) return rejectWithValue('No file selected');
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
 
-    return true;
-  } catch (error) {
-    dispatch(uploadFailure(error.message));
-    return false;
-  }
-};
+      const response = await axios.post(`${API_URL}/predict`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
 
-export const fetchEmotions = () => async (dispatch) => {
-  dispatch(setEmotionsLoading());
-
-  try {
-    const response = await axios.get(`${API_URL}/emotions`);
-
-    if (response.data.success) {
-      return response.data.emotions; // Pastikan ini mengambil `emotions`
-    } else {
-      return rejectWithValue(response.data.message || "Failed to fetch emotions");
+      if (response.data.success) {
+        return response.data.result; 
+      } else {
+        return rejectWithValue(response.data.message || 'File upload failed');
+      }
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to upload file');
     }
-    
-  } catch (error) {
-    return rejectWithValue(error.response?.data || "Failed to fetch emotions");
   }
-};
+);
+
+export const fetchEmotions = createAsyncThunk(
+  'emotion/fetchEmotions',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${API_URL}/emotions`);
+      return response.data.emotions;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to fetch emotions');
+    }
+  }
+);

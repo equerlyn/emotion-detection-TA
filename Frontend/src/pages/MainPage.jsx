@@ -6,8 +6,7 @@ import UploadFile from '../components/UploadFile';
 
 const MainPage = () => {
   const dispatch = useDispatch();
-  
-  // Reset state when navigating to the main page
+
   useEffect(() => {
     dispatch(resetState());
   }, [dispatch]);

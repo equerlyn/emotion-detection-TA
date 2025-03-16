@@ -7,24 +7,29 @@ import ResultComparison from '../components/ResultComparison';
 
 const ResultPage = () => {
   const result = useSelector(state => state.emotion.result);
+  const status = useSelector(state => state.emotion.status);
+
+  console.log(result);
+
   const navigate = useNavigate();
 
-  // Pastikan `result` dan `actual` serta `predicted` ada sebelum diakses
-  const actual = result?.result?.actual ?? { valence: 0, arousal: 0, dominance: 0, label: "Unknown" };
-  const predicted = result?.result?.predicted ?? { valence: 0, arousal: 0, dominance: 0, label: "Unknown" };
+  const actual = result.actual ?? { valence: 0, arousal: 0, dominance: 0, label: "Unknown" };
+  const predicted = result.predicted ?? { valence: 0, arousal: 0, dominance: 0, label: "Unknown" };
 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!result) {
+    if (status === 'failed' || !result || Object.keys(result).length === 0) {
       setLoading(true);
-      setTimeout(() => navigate("/"), 2000); // Redirect ke home setelah 2 detik jika result tidak ada
+      setTimeout(() => {
+        navigate("/"); 
+      }, 2000);
     } else {
       setLoading(false);
     }
   }, [result, navigate]);
 
-  if (loading) {
+  if (!result || loading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <h1 className="text-2xl font-bold french-blue">Loading...</h1>
@@ -37,23 +42,6 @@ const ResultPage = () => {
       <Navbar />
       <div className="pl-4 bg flex flex-col items-center justify-center h-full">
         <ResultText />
-        {/* <div className="grid grid-cols-2 w-full justify-items-center">
-          <ResultCard 
-            valence={actual.valence} 
-            arousal={actual.arousal} 
-            dominance={actual.dominance} 
-            label={actual.label} 
-            type="actual" 
-          />
-          <ResultCard 
-            valence={predicted.valence} 
-            arousal={predicted.arousal} 
-            dominance={predicted.dominance} 
-            label={predicted.label} 
-            type="predicted" 
-          />
-        </div> */}
-
         <ResultComparison actual={actual} predicted={predicted} />
       </div>
     </div>

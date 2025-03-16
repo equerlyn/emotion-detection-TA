@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchModels, setSelectedModel } from "../connection/emotionSlice";
+import { fetchModels, setSelectedModel } from '../redux/reducers/emotionReducer';
 
 const Dropdown = () => {
   const dispatch = useDispatch();

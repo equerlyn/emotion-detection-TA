@@ -1,86 +1,55 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { fetchEmotions, uploadFile } from '../actions/emotionActions';
 
 const initialState = {
   file: null,
   isUploading: false,
   isProcessing: false,
-  emotions: [],  // Tambahkan ini untuk menyimpan data emosi
-  status: 'idle', // idle | loading | succeeded | failed
+  emotions: [],  
+  status: 'idle', 
   error: null,
-  result: {
-    actual: {
-      valence: null,
-      arousal: null,
-      dominance: null,
-      label: null
-    },
-    predicted: {
-      valence: null,
-      arousal: null,
-      dominance: null,
-      label: null
-    },
-    emoji: null
-  }
+  result: {}
 };
 
 const emotionSlice = createSlice({
   name: 'emotion',
   initialState,
   reducers: {
-    setFile: (state, action) => {
-      state.file = action.payload;
-    },
-    startUpload: (state) => {
-      state.isUploading = true;
-      state.error = null;
-    },
-    uploadSuccess: (state) => {
-      state.isUploading = false;
-    },
-    uploadFailure: (state, action) => {
-      state.isUploading = false;
-      state.error = action.payload;
-    },
-    startProcessing: (state) => {
-      state.isProcessing = true;
-      state.error = null;
-    },
-    setResults: (state, action) => {
-      state.isProcessing = false;
-      state.result = action.payload;
-    },
-    processingFailure: (state, action) => {
-      state.isProcessing = false;
-      state.error = action.payload;
-    },
     resetState: () => initialState,
-    setHasNavigated(state) {
-      state.hasNavigated = true;
+    setHasNavigated: (state) => {
+      state.hasNavigated = true;  
     },
-    setEmotions: (state, action) => {
-      state.emotions = action.payload;
-      state.status = 'succeeded';
-    },
-    setEmotionsLoading: (state) => {
-      state.status = 'loading';
-    },
-    setEmotionsError: (state, action) => {
-      state.status = 'failed';
-      state.error = action.payload;
-    },
-  }
+  },
+  extraReducers: (builder) => {
+    builder
+      // Fetch emotions cases
+      .addCase(fetchEmotions.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchEmotions.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.emotions = action.payload; // Simpan data ke state
+      })
+      .addCase(fetchEmotions.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      
+      // Upload file cases
+      .addCase(uploadFile.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(uploadFile.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.result = action.payload;
+      })
+      .addCase(uploadFile.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      });
+  },
 });
 
-export const {
-  setFile,
-  startUpload,
-  uploadSuccess,
-  uploadFailure,
-  startProcessing,
-  setResults,
-  processingFailure,
-  resetState
-} = emotionSlice.actions;
+export const { resetState, setHasNavigated} = emotionSlice.actions;
 
 export default emotionSlice.reducer;
